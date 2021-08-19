@@ -1,1 +1,1 @@
-export * from './IDIDManager';
+export * from './did';

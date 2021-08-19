@@ -1,8 +1,10 @@
-import { EHOSTUNREACH } from 'constants';
 import Web3 from 'web3';
-import { Claim, ClaimHash, CredentialHash, Identity } from './credential';
+import { Contract } from 'web3-eth-contract';
+import { IDIDManager, IssuerBase } from './interfaces';
+import { Claim, Identity } from './interfaces/credential';
+import { keccak256 } from './utils';
 
-const _issuerInterfaceJson = require('./contracts/abi/issuer.json');
+const _issuerInterfaceJson = require('./contracts/abi/issuer.interface.json');
 
 /**
  * checks if the address is the contract that is an issuer which manages verifiable credentials.
@@ -19,35 +21,69 @@ export const defaultClaimParser = (o: Object) => {
 };
 
 export const getIssuer = async (
-  web3: Web3,
+  did: IDIDManager,
   issuer: Identity
 ): Promise<IssuerBase> => {
-  if (await isIssuerContract(web3, issuer)) {
-    return new ContractIssuer(issuer);
+  if (await isIssuerContract(did.web3, issuer)) {
+    return new ContractIssuer(did, issuer);
   } else {
-    return new WalletIssuer(issuer);
+    return new WalletIssuer(did, issuer);
   }
 };
 
-export interface IssuerBase {
-  issuer: Identity;
-  claimParser: (o: Claim) => ClaimHash;
-}
-
 export class WalletIssuer implements IssuerBase {
+  did: IDIDManager;
   issuer: Identity;
   claimParser = defaultClaimParser;
 
-  constructor(issuer: Identity) {
+  constructor(did: IDIDManager, issuer: Identity) {
+    this.did = did;
     this.issuer = issuer;
+  }
+
+  async issueVerfiaibleCredential(
+    identity: Identity,
+    claim: Claim
+  ): Promise<void> {}
+
+  async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {
+    return keccak256(
+      this.did.web3.eth.abi.encodeParameters(
+        ['bytes32', 'address', 'bytes32'],
+        [
+          await this.did.registry.methods.DOMAIN_SEPARATOR().call(),
+          identity,
+          keccak256(this.claimParser(claim)),
+        ]
+      )
+    );
   }
 }
 
 export class ContractIssuer implements IssuerBase {
+  did: IDIDManager;
   issuer: Identity;
+  contract: Contract;
   claimParser = defaultClaimParser;
 
-  constructor(issuer: Identity) {
+  constructor(did: IDIDManager, issuer: Identity) {
+    this.did = did;
     this.issuer = issuer;
+    this.contract = new this.did.web3.eth.Contract(
+      _issuerInterfaceJson,
+      issuer
+    );
+  }
+
+  async issueVerfiaibleCredential(
+    identity: Identity,
+    claim: Claim
+  ): Promise<void> {}
+
+  async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {
+    return await this.contract.methods.getCredentialHash(
+      identity,
+      this.claimParser(claim)
+    );
   }
 }
