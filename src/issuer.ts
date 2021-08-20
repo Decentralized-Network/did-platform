@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { Contract } from 'web3-eth-contract';
+import { Contract, SendOptions } from 'web3-eth-contract';
 import { IDIDManager, Issuer } from './interfaces';
 import { Claim, Expiration, Identity } from './interfaces/credential';
 import { keccak256, toEtherTimestamp } from './utils';
@@ -44,7 +44,8 @@ export class WalletIssuer implements Issuer {
   async issueVerfiaibleCredential(
     identity: Identity,
     claim: Claim,
-    expiredAt: Expiration
+    expiredAt: Expiration,
+    txOptions?: SendOptions
   ): Promise<void> {
     await this.did.registry.methods
       .validateCredential(
@@ -52,7 +53,7 @@ export class WalletIssuer implements Issuer {
         await this.getCredentialHash(identity, claim),
         toEtherTimestamp(expiredAt)
       )
-      .send({ from: this.issuer });
+      .send({ from: this.issuer, ...(txOptions || {}) });
   }
 
   async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {
@@ -66,6 +67,19 @@ export class WalletIssuer implements Issuer {
         ]
       )
     );
+  }
+
+  async delegate(
+    identity: Identity,
+    expiredAt: Expiration,
+    txOptions?: SendOptions
+  ): Promise<void> {
+    throw new Error('Wallet issuer cannot delegate');
+  }
+
+  async isIssuable(identity: Identity): Promise<boolean> {
+    // Only issuer can issue in wallet issuer
+    return identity === this.issuer;
   }
 }
 
@@ -87,13 +101,32 @@ export class ContractIssuer implements Issuer {
   async issueVerfiaibleCredential(
     identity: Identity,
     claim: Claim,
-    expiredAt: Expiration
-  ): Promise<void> {}
+    expiredAt: Expiration,
+    txOptions: SendOptions
+  ): Promise<void> {
+    return await this.contract.methods
+      .issue(identity, await this.getCredentialHash(identity, claim), expiredAt)
+      .send(txOptions);
+  }
 
   async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {
     return await this.contract.methods.getCredentialHash(
       identity,
       this.claimParser(claim)
     );
+  }
+
+  async delegate(
+    identity: Identity,
+    expiredAt: Expiration,
+    txOptions: SendOptions
+  ): Promise<void> {
+    return await this.contract.methods
+      .addDelegate(identity, toEtherTimestamp(expiredAt))
+      .send(txOptions);
+  }
+
+  async isIssuable(identity: Identity): Promise<boolean> {
+    return await this.contract.methods.isIssuable(identity).call();
   }
 }

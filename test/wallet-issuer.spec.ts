@@ -1,9 +1,12 @@
 import { expect } from 'chai';
+import chai from 'chai';
 import Web3 from 'web3';
 import { Issuer } from '../src/interfaces';
 import { Identity } from '../src/interfaces/credential';
 import { DID } from './../src/did';
 import { provider, registry as _registry } from './environment';
+
+chai.use(require('chai-as-promised'));
 
 describe('WalletIssuer', () => {
   const web3 = new Web3(provider);
@@ -79,5 +82,10 @@ describe('WalletIssuer', () => {
         .checkCredential(issuerAddress, credentialHash)
         .call()
     ).to.be.not.equal(true);
+  });
+
+  it('Should not delegate other', async () => {
+    expect(issuer.delegate(identities[0], expirationGenerator())).to.be
+      .rejected;
   });
 });

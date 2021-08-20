@@ -23,7 +23,7 @@ export type DomainConfig = {
 
 export type DomainQueryConfig = {
   issuerDomain?: string;
-}
+};
 
 export interface IIssuerManager {
   at(issuer: Identity): Promise<Issuer>;
@@ -43,8 +43,17 @@ export interface Issuer {
   issueVerfiaibleCredential(
     identity: Identity,
     claim: Claim,
-    expiredAt: Expiration
+    expiredAt: Expiration,
+    txOptions?: SendOptions
   ): Promise<void>;
+
+  delegate(
+    identity: Identity,
+    expiredAt: Expiration,
+    txOptions?: SendOptions
+  ): Promise<void>;
+
+  isIssuable(identity: Identity): Promise<boolean>;
 
   getCredentialHash(identity: Identity, claim: Claim): Promise<string>;
 }
