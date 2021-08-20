@@ -1,24 +1,28 @@
 import { expect } from 'chai';
-import { WalletIssuer } from '../src/IssuerManager';
-import { did, web3 } from './environment';
+import Web3 from 'web3';
+import { DID } from './../src/did';
+import { provider, registry } from './environment';
 
 describe('Registry', () => {
+  const web3 = new Web3(provider);
+  const did = new DID({ web3, registry });
+
   let issuerAddress: string;
 
   before(async () => {
     issuerAddress = (await web3.eth.getAccounts())[0];
   });
 
+  // Test environment is defined in `environment.ts`. If this test is not
+  // passed, please check the environment.
   it('Should get registry code', async () => {
-    // Test environment is defined in `environment.ts`. If this test is not
-    // passed, please check the environment.
     const contractCode = await web3.eth.getCode(did.registry.options.address);
     expect(contractCode).to.not.equal('0x');
   });
 
+  // Every DID registry has domain separator to prevent replay attack,
+  // which separates the same claim hash with other registries.
   it('Should have valid domain separator in registry', async () => {
-    // Every DID registry has domain separator to prevent replay attack,
-    // which separates the same claim hash with other registries.
     const calculatedDomainSeparator = web3.utils.keccak256(
       web3.eth.abi.encodeParameters(
         ['bytes32', 'bytes32', 'uint', 'address'],

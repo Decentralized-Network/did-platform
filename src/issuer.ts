@@ -1,8 +1,8 @@
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
-import { IDIDManager, IssuerBase } from './interfaces';
-import { Claim, Identity } from './interfaces/credential';
-import { keccak256 } from './utils';
+import { IDIDManager, Issuer } from './interfaces';
+import { Claim, Expiration, Identity } from './interfaces/credential';
+import { keccak256, toEtherTimestamp } from './utils';
 
 const _issuerInterfaceJson = require('./contracts/abi/issuer.interface.json');
 
@@ -23,7 +23,7 @@ export const defaultClaimParser = (o: Object) => {
 export const getIssuer = async (
   did: IDIDManager,
   issuer: Identity
-): Promise<IssuerBase> => {
+): Promise<Issuer> => {
   if (await isIssuerContract(did.web3, issuer)) {
     return new ContractIssuer(did, issuer);
   } else {
@@ -31,7 +31,7 @@ export const getIssuer = async (
   }
 };
 
-export class WalletIssuer implements IssuerBase {
+export class WalletIssuer implements Issuer {
   did: IDIDManager;
   issuer: Identity;
   claimParser = defaultClaimParser;
@@ -43,8 +43,17 @@ export class WalletIssuer implements IssuerBase {
 
   async issueVerfiaibleCredential(
     identity: Identity,
-    claim: Claim
-  ): Promise<void> {}
+    claim: Claim,
+    expiredAt: Expiration
+  ): Promise<void> {
+    await this.did.registry.methods
+      .validateCredential(
+        identity,
+        await this.getCredentialHash(identity, claim),
+        toEtherTimestamp(expiredAt)
+      )
+      .send({ from: this.issuer });
+  }
 
   async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {
     return keccak256(
@@ -60,7 +69,7 @@ export class WalletIssuer implements IssuerBase {
   }
 }
 
-export class ContractIssuer implements IssuerBase {
+export class ContractIssuer implements Issuer {
   did: IDIDManager;
   issuer: Identity;
   contract: Contract;
@@ -77,7 +86,8 @@ export class ContractIssuer implements IssuerBase {
 
   async issueVerfiaibleCredential(
     identity: Identity,
-    claim: Claim
+    claim: Claim,
+    expiredAt: Expiration
   ): Promise<void> {}
 
   async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {

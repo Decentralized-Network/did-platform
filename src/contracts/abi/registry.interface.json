@@ -69,11 +69,6 @@
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "identity",
-        "type": "address"
-      },
-      {
         "internalType": "bytes32",
         "name": "credentialHash",
         "type": "bytes32"
@@ -184,6 +179,19 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "credentialHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "invalidateCredential",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "identity",
         "type": "address"
@@ -206,6 +214,24 @@
         "name": "identity",
         "type": "address"
       },
+      {
+        "internalType": "bytes32",
+        "name": "credentialHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expiredAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "validateCredential",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "bytes32",
         "name": "credentialHash",
