@@ -5,4 +5,8 @@ export class IdentityManager extends ManagerBase {
   constructor(did: IDIDManager) {
     super(did);
   }
+
+  async at(identity: Identity): Promise<Identity> {
+
+  }
 }

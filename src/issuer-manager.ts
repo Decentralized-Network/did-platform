@@ -1,15 +1,13 @@
+import { Contract, SendOptions } from 'web3-eth-contract';
 import {
-  DomainConfig,
   DomainQueryConfig,
   IDIDController,
   IDIDManager,
   IIssuerManager,
-  Issuer,
+  Issuer
 } from './interfaces';
-import { Identity } from './interfaces/credential';
+import { Identity } fr1om './interfaces/credential';
 import { getIssuer } from './issuer';
-import { SendOptions, Contract } from 'web3-eth-contract';
-import { keccak256 } from './utils';
 
 const _issuerDomainInterfaceJson = require('./contracts/abi/issuer-domain.interface.json');
 

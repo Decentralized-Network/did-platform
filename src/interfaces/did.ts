@@ -56,4 +56,6 @@ export interface Issuer {
   isIssuable(identity: Identity): Promise<boolean>;
 
   getCredentialHash(identity: Identity, claim: Claim): Promise<string>;
+
+  validateCredential(identity: Identity, claim: Claim): Promise<boolean>;
 }

@@ -81,6 +81,13 @@ export class WalletIssuer implements Issuer {
     // Only issuer can issue in wallet issuer
     return identity === this.issuer;
   }
+
+  async validateCredential(identity: Identity, claim: Claim): Promise<boolean> {
+    const credentialHash = await this.getCredentialHash(identity, claim);
+    return await this.did.registry.methods
+      .checkCredential(this.issuer, credentialHash)
+      .call();
+  }
 }
 
 export class ContractIssuer implements Issuer {
@@ -128,5 +135,12 @@ export class ContractIssuer implements Issuer {
 
   async isIssuable(identity: Identity): Promise<boolean> {
     return await this.contract.methods.isIssuable(identity).call();
+  }
+
+  async validateCredential(identity: Identity, claim: Claim): Promise<boolean> {
+    const credentialHash = await this.getCredentialHash(identity, claim);
+    return await this.did.registry.methods
+      .checkCredential(this.issuer, credentialHash)
+      .call();
   }
 }
