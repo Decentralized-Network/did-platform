@@ -85,7 +85,7 @@ describe('WalletIssuer', () => {
   });
 
   it('Should not delegate other', async () => {
-    expect(issuer.delegate(identities[0], expirationGenerator())).to.be
+    await expect(issuer.delegate(identities[0], expirationGenerator())).to.be
       .rejected;
   });
 });

@@ -46,38 +46,50 @@ describe('ContractIssuer', () => {
   });
 
   it('Should credential hash by contract call', async () => {
-    expect(issuer.getCredentialHash(identities[0], claim)).to.not.rejected;
-  });
-
-  it('Should delegate other', async () => {
-    expect(issuer.delegate(identities[0], expirationGenerator())).to.not
+    await expect(issuer.getCredentialHash(identities[0], claim)).to.not
       .rejected;
   });
 
+  it('Should delegate other', async () => {
+    await expect(
+      issuer.delegate(identities[0], expirationGenerator(), {
+        from: issuerAddress,
+      })
+    ).to.be.fulfilled;
+  });
+
+  it('Should not delegate other from not owner', async () => {
+    await expect(
+      issuer.delegate(identities[1], expirationGenerator(), {
+        from: identities[0],
+      })
+    ).to.be.rejected;
+  });
+
   it('Should generate credential by owner', async () => {
-    expect(
+    await expect(
       issuer.issueVerfiaibleCredential(
         identities[1],
         claim,
         expirationGenerator(),
         { from: issuerAddress }
       )
-    ).to.be.not.rejected;
+    ).to.be.fulfilled;
   });
 
   it('Should generate credential by delegate', async () => {
-    expect(
+    await expect(
       issuer.issueVerfiaibleCredential(
         identities[2],
         claim,
         expirationGenerator(),
         { from: identities[0] }
       )
-    ).to.be.not.rejected;
+    ).to.fulfilled;
   });
 
   it('Should not generate credential by others', async () => {
-    expect(
+    await expect(
       issuer.issueVerfiaibleCredential(
         identities[3],
         claim,

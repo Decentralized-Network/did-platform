@@ -4,9 +4,9 @@ import {
   IDIDController,
   IDIDManager,
   IIssuerManager,
-  Issuer
+  Issuer,
 } from './interfaces';
-import { Identity } fr1om './interfaces/credential';
+import { Identity } from './interfaces/credential';
 import { getIssuer } from './issuer';
 
 const _issuerDomainInterfaceJson = require('./contracts/abi/issuer-domain.interface.json');

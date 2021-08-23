@@ -117,10 +117,9 @@ export class ContractIssuer implements Issuer {
   }
 
   async getCredentialHash(identity: Identity, claim: Claim): Promise<string> {
-    return await this.contract.methods.getCredentialHash(
-      identity,
-      this.claimParser(claim)
-    );
+    return await this.contract.methods
+      .getCredentialHash(identity, keccak256(this.claimParser(claim)))
+      .call();
   }
 
   async delegate(

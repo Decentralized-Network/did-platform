@@ -35,22 +35,24 @@ describe('IssuerDomain', () => {
 
     const contract = new web3.eth.Contract(issuerAbi, contractAddress);
 
-    expect(await contract.methods.domainName().call()).to.be.equal(domainName);
+    await expect(contract.methods.domainName().call()).eventually.to.be.equal(
+      domainName
+    );
   });
 
   it('Should not create issuer with the duplicated domain name', async () => {
-    expect(did.issuer.create(domainName, '', { from: issuerAddress })).to.be
-      .rejected;
+    await expect(did.issuer.create(domainName, '', { from: issuerAddress })).to
+      .be.rejected;
 
-    expect(did.issuer.create(domainName, '', { from: identities[1] })).to.be
-      .rejected;
+    await expect(did.issuer.create(domainName, '', { from: identities[1] })).to
+      .be.rejected;
   });
 
   it('Should find domain by domain name', async () => {
-    expect(did.issuer.domain(domainName)).to.be.not.rejected;
+    await expect(did.issuer.domain(domainName)).to.be.fulfilled;
   });
 
   it('Should be rejected for not registered domain name', async () => {
-    expect(did.issuer.domain('Test DoMain')).to.be.rejected;
+    await expect(did.issuer.domain('Test DoMain')).to.be.rejected;
   });
 });
