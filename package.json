@@ -1,10 +1,14 @@
 {
-  "name": "did-platform",
+  "name": "did-platform-hanyang",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/src/did.js",
+  "types": "dist/src/did.d.ts",
   "scripts": {
-    "test": "mocha ./test/**/*.ts -r node_modules/ts-node/register"
+    "test": "mocha ./test/**/*.ts -r node_modules/ts-node/register",
+    "clean": "rm -rf ./dist",
+    "copy-files": "cp -r ./src/contracts/ ./dist/src/contracts",
+    "build": "npm run clean && tsc && npm run copy-files"
   },
   "author": "",
   "license": "ISC",
@@ -22,5 +26,9 @@
   },
   "dependencies": {
     "web3": "^1.5.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Decentralized-Network/did-platform"
   }
 }
