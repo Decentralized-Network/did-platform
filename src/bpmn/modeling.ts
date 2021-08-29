@@ -1,6 +1,13 @@
 const Convert = require('xml-js');
 
-export function extract_process_from_xml(xml: string): Array<any> {
+const attr = '_attributes';
+const attrid = 'id';
+const attrname = 'name';
+const attr_flow = 'bpmn2:sequenceFlow';
+const attr_source = 'sourceRef';
+const attr_target = 'targetRef';
+
+function extract_process_from_xml(xml: string): Array<any> {
   const options = {
     compact: true,
     alwaysArray: true,
@@ -12,12 +19,8 @@ export function extract_process_from_xml(xml: string): Array<any> {
   return js['bpmn2:definitions'][0]['bpmn2:process'];
 }
 
-const attr = '_attributes';
-const attrid = 'id';
-const attrname = 'name';
-
 // id 로 요소 찾기
-export function find_element_by_id(js: any, id: string): any {
+function find_element_by_id(js: any, id: string): any {
   for (let [key, value] of Object.entries<Array<any>>(js)) {
     for (let v of value) {
       let cur_id = v['_attributes']['id'];
@@ -29,7 +32,7 @@ export function find_element_by_id(js: any, id: string): any {
   return null;
 }
 
-export function find_element_by_name(js: any, name: string): any {
+function find_element_by_name(js: any, name: string): any {
   for (let [key, value] of Object.entries<Array<any>>(js)) {
     if (key == name) {
       return value;
@@ -86,10 +89,6 @@ class CompactNode {
   };
 }
 
-const attr_flow = 'bpmn2:sequenceFlow';
-const attr_source = 'sourceRef';
-const attr_target = 'targetRef';
-
 type EdgeCache = {
   [id: string]: Edge;
 };
@@ -106,7 +105,7 @@ type Processes = {
   [id: string]: Graph;
 };
 
-function extract_process_graph_from_xml(
+export function extract_process_graph_from_xml(
   xml: string
 ): [NodeCache, EdgeCache, Processes] {
   let node_cache: NodeCache = {};
