@@ -41,23 +41,35 @@ export function find_element_by_name(js: any, name: string): any {
 class Node {
   id: string;
   name: string;
+  js: any;
 
-  constructor(id: string, name: string) {
+  constructor(id: string, name: string, js: any) {
     this.id = id;
     this.name = name;
+    this.js = js;
   }
+
+  public toString = (): string => {
+    return `id: ${this.id}, name: ${this.name}`;
+  };
 }
 
 class Edge {
   id: string;
   source: string;
   target: string;
+  js: any;
 
-  constructor(id: string, source: string, target: string) {
+  constructor(id: string, source: string, target: string, js: any) {
     this.id = id;
     this.source = source;
     this.target = target;
+    this.js = js;
   }
+
+  public toString = (): string => {
+    return `id: ${this.id}, source: ${this.source}, target: ${this.target}`;
+  };
 }
 
 class CompactNode {
@@ -68,6 +80,10 @@ class CompactNode {
     this.nodeId = nodeId;
     this.edgeId = edgeId;
   }
+
+  public toString = (): string => {
+    return `nodeId: ${this.nodeId}, edgeId: ${this.edgeId}`;
+  };
 }
 
 const attr_flow = 'bpmn2:sequenceFlow';
@@ -107,7 +123,7 @@ function extract_process_graph_from_xml(
     element = element[0];
     let eid = element[attr][attrid];
     let name = element[attr][attrname];
-    let node = new Node(eid, name);
+    let node = new Node(eid, name, element);
     node_cache[node.id] = node;
     return node;
   }
@@ -117,7 +133,7 @@ function extract_process_graph_from_xml(
   for (let process of js) {
     let pid = process[attr][attrid];
     let name = process[attr][attrname];
-    let pnode = new Node(pid, name);
+    let pnode = new Node(pid, name, process);
     node_cache[pnode.id] = pnode;
 
     let relations: Graph = {};
@@ -125,11 +141,10 @@ function extract_process_graph_from_xml(
     // 노드간 모든 관계가 포함되어 있다.
     let flows = find_element_by_name(process, attr_flow) as Array<any>;
     for (let flow of flows) {
-      console.log(flow);
       let flow_id = flow[attr][attrid];
       let source_id = flow[attr][attr_source];
       let target_id = flow[attr][attr_target];
-      edge_cache[flow_id] = new Edge(flow_id, source_id, target_id);
+      edge_cache[flow_id] = new Edge(flow_id, source_id, target_id, flow);
 
       let source = getNode(process, source_id);
       let target = getNode(process, target_id);
