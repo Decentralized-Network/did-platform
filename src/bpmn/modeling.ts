@@ -3,6 +3,7 @@ const Convert = require('xml-js');
 const attr = '_attributes';
 const attrid = 'id';
 const attrname = 'name';
+const attrrole = 'role';
 const attr_flow = 'bpmn2:sequenceFlow';
 const attr_source = 'sourceRef';
 const attr_target = 'targetRef';
@@ -45,17 +46,19 @@ class Node {
   key: string;
   id: string;
   name: string;
+  role: string;
   js: any;
 
-  constructor(key: string, id: string, name: string, js: any) {
+  constructor(key: string, id: string, name: string, role: string, js: any) {
     this.key = key;
     this.id = id;
     this.name = name;
+    this.role = role;
     this.js = js;
   }
 
   public toString = (): string => {
-    return `key: ${this.key}, id: ${this.id}, name: ${this.name}`;
+    return `key: ${this.key}, id: ${this.id}, name: ${this.name}, role: ${this.role}`;
   };
 }
 
@@ -130,9 +133,11 @@ export function extract_process_graph_from_xml(
       throw 'Id undefined' + node_id;
     }
     element = element[0];
+
     let eid = element[attr][attrid];
     let name = element[attr][attrname];
-    let node = new Node(key, eid, name, element);
+    let role = element[attr][attrrole];
+    let node = new Node(key, eid, name, role, element);
     node_cache[node.id] = node;
     return node;
   }
@@ -142,7 +147,7 @@ export function extract_process_graph_from_xml(
   for (let process of js) {
     let pid = process[attr][attrid];
     let name = process[attr][attrname];
-    let pnode = new Node('process', pid, name, process);
+    let pnode = new Node('process', pid, name, process, '');
     node_cache[pnode.id] = pnode;
 
     let relations: Graph = {};
