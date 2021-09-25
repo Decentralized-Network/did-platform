@@ -63,17 +63,25 @@ class Edge {
   id: string;
   source: string;
   target: string;
+  conditionExpression: string;
   js: any;
 
-  constructor(id: string, source: string, target: string, js: any) {
+  constructor(
+    id: string,
+    source: string,
+    target: string,
+    conditionExpression: string,
+    js: any
+  ) {
     this.id = id;
     this.source = source;
     this.target = target;
+    this.conditionExpression = conditionExpression;
     this.js = js;
   }
 
   public toString = (): string => {
-    return `id: ${this.id}, source: ${this.source}, target: ${this.target}`;
+    return `id: ${this.id}, source: ${this.source}, target: ${this.target}, express: ${this.conditionExpression}`;
   };
 }
 
@@ -145,7 +153,17 @@ export function extract_process_graph_from_xml(
       let flow_id = flow[attr][attrid];
       let source_id = flow[attr][attr_source];
       let target_id = flow[attr][attr_target];
-      edge_cache[flow_id] = new Edge(flow_id, source_id, target_id, flow);
+      let conditionExpression = '';
+      if ('bpmn2:conditionExpression' in flow) {
+        conditionExpression = flow['bpmn2:conditionExpression'][0]['_text'][0];
+      }
+      edge_cache[flow_id] = new Edge(
+        flow_id,
+        source_id,
+        target_id,
+        conditionExpression,
+        flow
+      );
 
       let source = getNode(process, source_id);
       let target = getNode(process, target_id);
