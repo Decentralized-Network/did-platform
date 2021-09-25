@@ -26,7 +26,7 @@ function find_element_by_id(js: any, id: string): any {
     for (let v of value) {
       let cur_id = v['_attributes']['id'];
       if (cur_id == id) {
-        return [key, value];
+        return [key, v];
       }
     }
   }
@@ -132,7 +132,6 @@ export function extract_process_graph_from_xml(
     if (element == null) {
       throw 'Id undefined' + node_id;
     }
-    element = element[0];
 
     let eid = element[attr][attrid];
     let name = element[attr][attrname];
