@@ -15,7 +15,7 @@
       <bpmn2:incoming>Flow_08kpenm</bpmn2:incoming>
       <bpmn2:outgoing>Flow_0wfm4c7</bpmn2:outgoing>
     </bpmn2:serviceTask>
-    <bpmn2:userTask id="Activity_1ne5gv0" name="정비확인" role="repiarman">
+    <bpmn2:userTask id="Activity_1ne5gv0" name="정비확인" role="repairman">
       <bpmn2:incoming>Flow_0wfm4c7</bpmn2:incoming>
       <bpmn2:outgoing>Flow_0zngxcx</bpmn2:outgoing>
     </bpmn2:userTask>
@@ -40,7 +40,7 @@
       <bpmn2:incoming>Flow_06utkak</bpmn2:incoming>
       <bpmn2:outgoing>Flow_064v7x2</bpmn2:outgoing>
     </bpmn2:userTask>
-    <bpmn2:userTask id="Activity_0tdfgkz" name="결제정보수정" role="repiarman">
+    <bpmn2:userTask id="Activity_0tdfgkz" name="결제정보수정" role="repairman">
       <bpmn2:incoming>Flow_0lvr9df</bpmn2:incoming>
       <bpmn2:outgoing>Flow_060dudn</bpmn2:outgoing>
     </bpmn2:userTask>
